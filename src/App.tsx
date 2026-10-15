@@ -100,11 +100,19 @@ export default function App() {
 
   const claimEvent = async () => {
     const text = '사주·소리오행·요즘 트렌드까지 보는 아기 이름 추천 앱, 해피너스!';
-    try {
-      if (navigator.share) await navigator.share({ text });
-      else await navigator.clipboard.writeText(text);
-    } catch {
-      return; // 공유를 취소하면 보상 없음
+    if (navigator.share) {
+      try {
+        await navigator.share({ text });
+      } catch {
+        return; // 공유를 취소하면 보상 없음
+      }
+    } else {
+      // 공유 시트가 없는 환경(데스크톱 등)은 링크 문구를 복사해 주고 참여로 인정
+      try {
+        await navigator.clipboard.writeText(text);
+      } catch {
+        /* 복사 권한이 없어도 이벤트 참여는 인정 */
+      }
     }
     setCredits(grantEvent(credits));
   };
